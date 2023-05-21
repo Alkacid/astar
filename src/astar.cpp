@@ -178,8 +178,8 @@ public:
     }
 };
 int MAX = 2500;
-priority_queue<board> half(priority_queue<board>& pq) {
-    priority_queue<board> newp;
+priority_queue<shared_ptr<board> > half(priority_queue<shared_ptr<board> >& pq) {
+    priority_queue<shared_ptr<board> > newp;
     for (int i = 0; i < 1500; i++) {
         newp.push(pq.top());
         pq.pop();
@@ -201,23 +201,24 @@ int main()
 {
     auto start = clock();
     board init = readmat();
-    std::priority_queue<board> pq;
+    std::priority_queue<shared_ptr<board> > pq;
     set<board,comp> used;
-    pq.push(init);
+    pq.push(make_shared<board>( init));
 
     int iters = 0;
     bool over = false;
     board res;
     while (!pq.empty()) {
         iters++;
-        board b(pq.top());
+        // board b(*pq.top());
+        auto b = pq.top();
         pq.pop();
         //used.insert(b);
-        used.insert(b);
+        used.insert(*b);
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 for (int k = 1; k <= 4; k++) {
-                    board neigbor = b.tap(i, j, k,false);
+                    board neigbor = b->tap(i, j, k,false);
                     if (neigbor.g == -1)
                         continue;
                     else if (neigbor.h == 0) {
@@ -230,7 +231,7 @@ int main()
                             if (pq.size() >= MAX) { 
                                 pq = half(pq);
                             }
-                            pq.push(neigbor);
+                            pq.push(make_shared<board> (neigbor));
                         }
                     }
                 }
