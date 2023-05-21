@@ -6,6 +6,7 @@
 #include <queue>
 #include <set>
 #include <time.h>
+#include <memory>
 using namespace std;
 int N;
 class board {
@@ -145,7 +146,7 @@ public:
 };
 
 board readmat() {
-    ifstream f("../input/input7.txt");
+    ifstream f("../input/input9.txt");
     if (!f) {
         cout << "aaaaaa" << endl;
     }
@@ -178,8 +179,13 @@ public:
     }
 };
 int MAX = 2500;
-priority_queue<shared_ptr<board> > half(priority_queue<shared_ptr<board> >& pq) {
-    priority_queue<shared_ptr<board> > newp;
+struct compare_board {
+    bool operator()(const shared_ptr<board>& a, const shared_ptr<board>& b) {
+        return *a < *b; // 调用board类的小于号重载函数
+    }
+};
+priority_queue<shared_ptr<board>, vector<shared_ptr<board>>, compare_board> half(priority_queue<shared_ptr<board>, vector<shared_ptr<board>>, compare_board>& pq) {
+    priority_queue<shared_ptr<board>, vector<shared_ptr<board>>, compare_board> newp;
     for (int i = 0; i < 1500; i++) {
         newp.push(pq.top());
         pq.pop();
@@ -201,7 +207,7 @@ int main()
 {
     auto start = clock();
     board init = readmat();
-    std::priority_queue<shared_ptr<board> > pq;
+    priority_queue<shared_ptr<board>, vector<shared_ptr<board>>, compare_board> pq;
     set<board,comp> used;
     pq.push(make_shared<board>( init));
 
